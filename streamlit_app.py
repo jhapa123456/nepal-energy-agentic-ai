@@ -8,19 +8,24 @@ import main
 
 ROOT = Path(__file__).resolve().parent
 
-st.set_page_config(page_title="Nepal Energy Agentic AI", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="नेपाल विद्युत् प्राधिकरण AGENTIC AI COMMAND CENTRE", page_icon="⚡", layout="wide")
 
 st.markdown("""
 <style>
 .block-container {padding-top: 1.2rem;}
 .metric-card {background:#f8fafc; padding:18px; border-radius:18px; border:1px solid #e5e7eb;}
-.big-title {font-size:34px; font-weight:800; color:#14385c;}
+.big-title {font-size:clamp(24px, 4vw, 42px); font-weight:900; color:#14385c; line-height:1.18; letter-spacing:-0.5px; white-space:normal; word-break:normal;}
+.title-box {background:linear-gradient(135deg,#eff6ff,#f8fafc); border:1px solid #dbeafe; border-radius:22px; padding:22px 24px; margin-bottom:10px; box-shadow:0 8px 24px rgba(15,23,42,0.08);}
 .subtle {color:#64748b; font-size:15px;}
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="big-title">⚡ Nepal Energy Agentic AI Command Center</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtle">Flat beginner-friendly demo: synthetic CSVs, multi-agent AI, Agentic RAG, evaluation, charts, PowerPoint, and DOCX in one place.</div>', unsafe_allow_html=True)
+st.markdown('''
+<div class="title-box">
+  <div class="big-title">⚡ नेपाल विद्युत् प्राधिकरण AGENTIC AI COMMAND CENTRE</div>
+  <div class="subtle">Agentic AI + RAG demo for energy-loss detection, revenue recovery, workforce productivity, evaluation, PowerPoint, and DOCX reporting.</div>
+</div>
+''', unsafe_allow_html=True)
 
 with st.sidebar:
     st.header("Run Demo")
