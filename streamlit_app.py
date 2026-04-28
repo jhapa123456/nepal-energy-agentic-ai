@@ -12,17 +12,19 @@ st.set_page_config(page_title="नेपाल विद्युत् प्�
 
 st.markdown("""
 <style>
-.block-container {padding-top: 1.2rem;}
+.block-container {padding-top: 4.2rem;}
 .metric-card {background:#f8fafc; padding:18px; border-radius:18px; border:1px solid #e5e7eb;}
 .big-title {font-size:clamp(24px, 4vw, 42px); font-weight:900; color:#14385c; line-height:1.18; letter-spacing:-0.5px; white-space:normal; word-break:normal;}
-.title-box {background:linear-gradient(135deg,#eff6ff,#f8fafc); border:1px solid #dbeafe; border-radius:22px; padding:22px 24px; margin-bottom:10px; box-shadow:0 8px 24px rgba(15,23,42,0.08);}
-.subtle {color:#64748b; font-size:15px;}
+.nepali-title {display:block; font-size:clamp(28px, 3.4vw, 38px); margin-bottom:8px; text-align:center;}
+.english-title {display:block; font-size:clamp(20px, 2.6vw, 30px); letter-spacing:0.8px; text-align:center;}
+.title-box {background:linear-gradient(135deg,#eff6ff,#f8fafc); border:1px solid #dbeafe; border-radius:24px; padding:30px 26px 24px 26px; margin-top:24px; margin-bottom:18px; box-shadow:0 8px 24px rgba(15,23,42,0.08);}
+.subtle {color:#64748b; font-size:15px; text-align:center; margin-top:10px;}
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown('''
 <div class="title-box">
-  <div class="big-title">⚡ नेपाल विद्युत् प्राधिकरण AGENTIC AI COMMAND CENTRE</div>
+  <div class="big-title"><span class="nepali-title">⚡ नेपाल विद्युत् प्राधिकरण</span><span class="english-title">AGENTIC AI COMMAND CENTRE</span></div>
   <div class="subtle">Agentic AI + RAG demo for energy-loss detection, revenue recovery, workforce productivity, evaluation, PowerPoint, and DOCX reporting.</div>
 </div>
 ''', unsafe_allow_html=True)
