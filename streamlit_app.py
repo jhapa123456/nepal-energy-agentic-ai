@@ -178,15 +178,17 @@ with tabs[7]:
     st.subheader("Deployment Plan for Nepal Electricity Authority (NEA)")
 
     st.markdown("""
-### Streamlit Community Cloud Demo Deployment
+### How NEA Can Deploy This Demo
 
-This package is ready for public demo deployment. It uses  data only and does **not** require an API key.
+This demo can be deployed on any cloud platform or on NEA’s own secure internal server.   
+For a real NEA production system, deployment should be done inside an approved, secure NEA environment.
+Share the public demo URL with NEA leadership, technical teams, and stakeholders.
 
 ---
 
-### Real NEA Production Data Sources
+### Option 1: Secure NEA Production Deployment
 
-For production, the system should connect only approved NEA sources:
+For real use inside Nepal Electricity Authority, the system should be connected to approved NEA data sources such as:
 
 - Smart meter data
 - Customer billing records
@@ -196,9 +198,7 @@ For production, the system should connect only approved NEA sources:
 - Substation and distribution network data
 - Field inspection reports
 
----
-
-### Production Controls Required
+The production version should include:
 
 - Secure login and role-based access control
 - NEA-approved data integration
@@ -211,11 +211,25 @@ For production, the system should connect only approved NEA sources:
 
 ---
 
-### NEA Business Value
+### What NEA Can Do With This System
 
-This 10-agent system can help NEA reduce repetitive employee workload for reading data, checking billing files, preparing inspection lists, and writing reports. Staff can then focus on higher-value work: field verification, customer service, revenue recovery, safety, planning, and governance.
+NEA can use this AI-powered platform to support:
 
-It can support energy loss detection, suspicious usage analysis, smart meter monitoring, transformer overload prediction, outage risk identification, revenue leakage analysis, customer service improvement, distribution network planning, and automatic reports for management and field offices.
+- Energy loss detection
+- Suspicious electricity usage analysis
+- Smart meter monitoring
+- Transformer overload prediction
+- Outage risk identification
+- Revenue leakage analysis
+- Customer service improvement
+- Data-driven planning for distribution networks
+- Automatic reports for management and field offices
 
-**Important:** This system supports NEA engineers and decision-makers. It should not replace human judgment, field verification, official approvals, legal review, or customer communication.
+---
+### Important Note
+
+For a real deployment, NEA should connect only approved internal data sources and add authentication, audit logs, monitoring, cybersecurity controls, and human approval gates.
+
+This system should support NEA engineers and decision-makers.  
+It should not replace human judgment, field verification, or official NEA approval processes.
 """)
