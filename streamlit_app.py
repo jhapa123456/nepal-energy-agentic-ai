@@ -8,14 +8,19 @@ import main
 
 ROOT = Path(__file__).resolve().parent
 
-st.set_page_config(page_title="नेपाल विद्युत् प्राधिकरण AGENTIC AI COMMAND CENTRE", page_icon="⚡", layout="wide")
+st.set_page_config(
+    page_title="नेपाल विद्युत् प्राधिकरण\nकेन्द्रीय कार्यालय, दरबारमार्ग, काठमाडौं, नेपाल\nINTELLIGENT ENERGY COMMAND CENTER",
+    page_icon="⚡",
+    layout="wide"
+)
 
 st.markdown("""
 <style>
 .block-container {padding-top: 4.2rem;}
 .metric-card {background:#f8fafc; padding:18px; border-radius:18px; border:1px solid #e5e7eb;}
 .big-title {font-size:clamp(24px, 4vw, 42px); font-weight:900; color:#14385c; line-height:1.18; letter-spacing:-0.5px; white-space:normal; word-break:normal;}
-.nepali-title {display:block; font-size:clamp(28px, 3.4vw, 38px); margin-bottom:8px; text-align:center;}
+.nepali-title {display:block; font-size:clamp(28px, 3.4vw, 38px); margin-bottom:6px; text-align:center;}
+.nepali-subtitle {display:block; font-size:clamp(17px, 2.2vw, 24px); font-weight:700; color:#1e3a8a; margin-bottom:10px; text-align:center;}
 .english-title {display:block; font-size:clamp(20px, 2.6vw, 30px); letter-spacing:0.8px; text-align:center;}
 .title-box {background:linear-gradient(135deg,#eff6ff,#f8fafc); border:1px solid #dbeafe; border-radius:24px; padding:30px 26px 24px 26px; margin-top:24px; margin-bottom:18px; box-shadow:0 8px 24px rgba(15,23,42,0.08);}
 .subtle {color:#64748b; font-size:15px; text-align:center; margin-top:10px;}
@@ -24,8 +29,14 @@ st.markdown("""
 
 st.markdown('''
 <div class="title-box">
-  <div class="big-title"><span class="nepali-title">⚡ नेपाल विद्युत् प्राधिकरण</span><span class="english-title">AGENTIC AI COMMAND CENTRE</span></div>
-  <div class="subtle">Agentic AI + RAG demo for energy-loss detection, revenue recovery, workforce productivity, evaluation, PowerPoint, and DOCX reporting.</div>
+  <div class="big-title">
+    <span class="nepali-title">⚡ नेपाल विद्युत् प्राधिकरण</span>
+    <span class="nepali-subtitle">केन्द्रीय कार्यालय, दरबारमार्ग, काठमाडौं, नेपाल</span>
+    <span class="english-title">AI-POWERED ENERGY INTELLIGENCE COMMAND CENTER</span>
+  </div>
+  <div class="subtle">
+    Agentic AI, Agentic RAG, smart-meter analytics, and automated reporting platform for energy-loss detection, revenue recovery, grid reliability, workforce productivity, and data-driven decision support.
+  </div>
 </div>
 ''', unsafe_allow_html=True)
 
@@ -38,7 +49,7 @@ with st.sidebar:
         st.success("Pipeline completed.")
         st.json(result)
     st.divider()
-    st.caption("No API key required. All data is synthetic.")
+    st.caption("No API key required.")
 
 # Auto-create outputs if missing.
 if not Path(main.RISK_CSV).exists() or not Path(main.PPTX_FILE).exists():
@@ -121,14 +132,62 @@ with tabs[5]:
                 st.download_button(label, f, file_name=Path(file_path).name)
 
 with tabs[6]:
-    st.subheader("Streamlit Community Cloud deployment")
-    st.markdown("""
-1. Create a GitHub repository.
-2. Upload all files from this folder to the repository root.
-3. Go to Streamlit Community Cloud.
-4. Select your repository.
-5. Set the app file to `streamlit_app.py`.
-6. Deploy and share the public URL with stakeholders in Nepal.
+    st.subheader("Deployment Plan for Nepal Electricity Authority (NEA)")
 
-No API key is required for this demo. For a real deployment, connect approved NEA data sources and add authentication, audit logs, monitoring, and human approval gates.
+    st.markdown("""
+### How NEA Can Deploy This Demo
+
+This demo can be deployed on any cloud platform or on NEA’s own secure internal server.  
+For a simple public demonstration, Streamlit Community Cloud can be used.  
+For a real NEA production system, deployment should be done inside an approved, secure NEA environment.
+Share the public demo URL with NEA leadership, technical teams, and stakeholders.
+
+---
+
+### Option 1: Secure NEA Production Deployment
+
+For real use inside Nepal Electricity Authority, the system should be connected to approved NEA data sources such as:
+
+- Smart meter data
+- Customer billing records
+- Transformer and feeder data
+- Outage and maintenance reports
+- Energy loss and theft-related records
+- Substation and distribution network data
+- Field inspection reports
+
+The production version should include:
+
+- Secure login and role-based access control
+- NEA-approved data integration
+- Audit logs for every user action
+- Human approval before any major decision
+- Monitoring dashboards for system health
+- Data privacy and cybersecurity controls
+- Backup and disaster recovery plan
+- Regular model validation by NEA engineers and domain experts
+
+---
+
+### What NEA Can Do With This System
+
+NEA can use this AI-powered platform to support:
+
+- Energy loss detection
+- Suspicious electricity usage analysis
+- Smart meter monitoring
+- Transformer overload prediction
+- Outage risk identification
+- Revenue leakage analysis
+- Customer service improvement
+- Data-driven planning for distribution networks
+- Automatic reports for management and field offices
+
+---
+### Important Note
+
+For a real deployment, NEA should connect only approved internal data sources and add authentication, audit logs, monitoring, cybersecurity controls, and human approval gates.
+
+This system should support NEA engineers and decision-makers.  
+It should not replace human judgment, field verification, or official NEA approval processes.
 """)
