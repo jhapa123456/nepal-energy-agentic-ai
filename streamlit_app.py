@@ -32,10 +32,10 @@ st.markdown('''
   <div class="big-title">
     <span class="nepali-title">⚡ नेपाल विद्युत् प्राधिकरण</span>
     <span class="nepali-subtitle">केन्द्रीय कार्यालय, दरबारमार्ग, काठमाडौं, नेपाल</span>
-    <span class="english-title">AI-POWERED ENERGY INTELLIGENCE COMMAND CENTER</span>
+    <span class="english-title">INTELLIGENT ENERGY COMMAND CENTER</span>
   </div>
   <div class="subtle">
-    Agentic AI, Agentic RAG, smart-meter analytics, and automated reporting platform for energy-loss detection, revenue recovery, grid reliability, workforce productivity, and data-driven decision support.
+    10-agent AI command system for smart-meter intelligence, billing and revenue recovery, transformer/feeder health, outage prediction, theft detection, field inspection approval, governance, monitoring, and automated executive reporting.
   </div>
 </div>
 ''', unsafe_allow_html=True)
@@ -67,35 +67,50 @@ vals = impact.set_index("metric")["value"]
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Scaled annual recovery", f"NPR {vals.get('Scaled annual recovery for 25,000-customer pilot', vals['Annual revenue recovery opportunity from high-risk customers']):,.0f}")
 c2.metric("Monthly recovery", f"NPR {vals['Monthly revenue recovery opportunity']:,.0f}")
-c3.metric("Redeployable capacity", f"{vals['Modeled maximum redeployable capacity']:.1f} FTE/mo")
+c3.metric("Manual capacity saved", f"{vals['Modeled maximum manual capacity saved']:.1f} FTE/mo")
 c4.metric("Repetitive workload reduction", f"{vals['Modeled repetitive workload reduction']:.1f}%")
 
-st.info("Employee impact is framed as repetitive workload reduction and staff capacity redeployment, not automatic layoffs. Human staff remain responsible for field work, approvals, governance, safety, and customer communication.")
+st.info("Employee impact is framed as reducing repetitive manual data-reading/reporting workload and redeploying staff to revenue recovery, field verification, customer service, governance, safety, and planning. Human approval remains required before major decisions.")
 
-tabs = st.tabs(["Executive Summary", "Risk Detection", "Feeder Priority", "Agentic RAG", "Evaluation", "Reports", "Deployment"])
+tabs = st.tabs(["Executive Summary", "10 AI Agents", "Risk Detection", "Feeder Priority", "Agentic RAG", "Evaluation", "Reports", "Deployment"])
 
 with tabs[0]:
     st.subheader("Best use case")
-    st.write("**NEA Energy Loss, Revenue Protection, and Workforce Productivity Command Center**")
-    st.write("This is stronger than a chatbot because it demonstrates end-to-end action: data ingestion, risk scoring, feeder prioritization, evidence retrieval, quality evaluation, and stakeholder-ready reporting.")
+    st.write("**NEA Intelligent Energy Command Center: 10-agent workflow for revenue recovery and manual workload reduction**")
+    st.write("This is stronger than a chatbot because each agent has a job: collect data, analyze risk, estimate revenue, reduce manual review, require human approval, and generate stakeholder-ready outputs.")
     st.dataframe(impact, use_container_width=True)
     colA, colB = st.columns(2)
     with colA:
-        st.image(str(main.CHART_WORKFORCE), caption="Workforce productivity / redeployment")
+        st.image(str(main.CHART_WORKFORCE), caption="Manual employee workload reduction / capacity saved")
     with colB:
         st.image(str(main.CHART_REVENUE), caption="Revenue recovery opportunity")
 
 with tabs[1]:
+    st.subheader("10 Specialized AI Agents for NEA")
+    st.write("Each agent has a clear NEA role: what data it reads, what analysis it performs, how it reduces repetitive employee workload, and how it supports revenue increase.")
+    agent_df = main.agent_roles_dataframe()
+    st.dataframe(agent_df, use_container_width=True)
+    st.markdown("""
+### Simple explanation
+- **Smart Meter Intelligence Agent** collects meter readings/events and detects abnormal usage.
+- **Billing and Revenue Agent** connects suspicious usage to lost kWh, arrears, and recoverable NPR.
+- **Field Inspection and Human Approval Agent** makes sure AI recommendations are checked by people before action.
+- **Governance, Security and Audit Agent** protects production deployment with login, role control, audit logs, privacy, and cybersecurity.
+
+This can reduce employees' repetitive manual data-reading work and increase revenue by helping staff focus only on high-risk, high-value cases.
+""")
+
+with tabs[2]:
     st.subheader("Suspicious customer activity detection")
     st.image(str(main.CHART_RISK), caption="Risk score distribution")
     st.dataframe(risk[["customer_id", "district", "feeder_id", "tariff_category", "kwh_change_pct", "meter_event", "risk_score_0_100", "estimated_revenue_recovery_npr_year", "recommended_action"]].head(50), use_container_width=True)
 
-with tabs[2]:
+with tabs[3]:
     st.subheader("Feeder loss and inspection priority")
     st.image(str(main.CHART_FEEDER), caption="Top feeder priority scores")
     st.dataframe(feeder.head(30), use_container_width=True)
 
-with tabs[3]:
+with tabs[4]:
     st.subheader("Agentic RAG demo")
     query = st.text_input("Ask a Nepal energy strategy question", "How can NEA reduce non-technical losses with AI?")
     knowledge = pd.read_csv(main.KNOWLEDGE_CSV)
@@ -105,7 +120,7 @@ with tabs[3]:
     st.text_area("Grounded answer", answer, height=260)
     st.dataframe(top[["chunk_id", "topic", "source_name", "similarity", "chunk_text", "source_url"]], use_container_width=True)
 
-with tabs[4]:
+with tabs[5]:
     st.subheader("RAG quality evaluation")
     st.image(str(main.CHART_RAG), caption="RAG metrics")
     st.dataframe(rag_eval, use_container_width=True)
@@ -117,7 +132,7 @@ with tabs[4]:
 - **Hallucination risk**: estimated unsupported content risk.
 """)
 
-with tabs[5]:
+with tabs[6]:
     st.subheader("Download generated stakeholder files")
     for file_path, label in [
         (main.PPTX_FILE, "Download PowerPoint"),
@@ -125,28 +140,35 @@ with tabs[5]:
         (main.BUSINESS_IMPACT_CSV, "Download Business Impact CSV"),
         (main.RAG_EVAL_CSV, "Download RAG Evaluation CSV"),
         (main.RISK_CSV, "Download Risk Scores CSV"),
+        (main.AGENT_ROLES_CSV, "Download Agent Roles CSV"),
         (main.AGENT_LOG_JSON, "Download Agent Log JSON"),
     ]:
         if Path(file_path).exists():
             with open(file_path, "rb") as f:
                 st.download_button(label, f, file_name=Path(file_path).name)
 
-with tabs[6]:
+with tabs[7]:
     st.subheader("Deployment Plan for Nepal Electricity Authority (NEA)")
 
     st.markdown("""
-### How NEA Can Deploy This Demo
+### Streamlit Community Cloud Demo Deployment
 
-This demo can be deployed on any cloud platform or on NEA’s own secure internal server.  
-For a simple public demonstration, Streamlit Community Cloud can be used.  
-For a real NEA production system, deployment should be done inside an approved, secure NEA environment.
-Share the public demo URL with NEA leadership, technical teams, and stakeholders.
+This package is ready for public demo deployment on Streamlit Community Cloud. It uses synthetic data only and does **not** require an API key.
+
+1. Create a GitHub repository, for example `nea-intelligent-energy-command-center`.
+2. Unzip this project on your computer.
+3. Upload all files inside the project folder to the repository root.
+4. Go to Streamlit Community Cloud.
+5. Click **Create app** / **New app**.
+6. Select the GitHub repository.
+7. Set **Main file path** to `streamlit_app.py`.
+8. Deploy and share the public URL with NEA leadership and stakeholders.
 
 ---
 
-### Option 1: Secure NEA Production Deployment
+### Real NEA Production Data Sources
 
-For real use inside Nepal Electricity Authority, the system should be connected to approved NEA data sources such as:
+For production, the system should connect only approved NEA sources:
 
 - Smart meter data
 - Customer billing records
@@ -156,7 +178,9 @@ For real use inside Nepal Electricity Authority, the system should be connected 
 - Substation and distribution network data
 - Field inspection reports
 
-The production version should include:
+---
+
+### Production Controls Required
 
 - Secure login and role-based access control
 - NEA-approved data integration
@@ -169,25 +193,11 @@ The production version should include:
 
 ---
 
-### What NEA Can Do With This System
+### NEA Business Value
 
-NEA can use this AI-powered platform to support:
+This 10-agent system can help NEA reduce repetitive employee workload for reading data, checking billing files, preparing inspection lists, and writing reports. Staff can then focus on higher-value work: field verification, customer service, revenue recovery, safety, planning, and governance.
 
-- Energy loss detection
-- Suspicious electricity usage analysis
-- Smart meter monitoring
-- Transformer overload prediction
-- Outage risk identification
-- Revenue leakage analysis
-- Customer service improvement
-- Data-driven planning for distribution networks
-- Automatic reports for management and field offices
+It can support energy loss detection, suspicious usage analysis, smart meter monitoring, transformer overload prediction, outage risk identification, revenue leakage analysis, customer service improvement, distribution network planning, and automatic reports for management and field offices.
 
----
-### Important Note
-
-For a real deployment, NEA should connect only approved internal data sources and add authentication, audit logs, monitoring, cybersecurity controls, and human approval gates.
-
-This system should support NEA engineers and decision-makers.  
-It should not replace human judgment, field verification, or official NEA approval processes.
+**Important:** This system supports NEA engineers and decision-makers. It should not replace human judgment, field verification, official approvals, legal review, or customer communication.
 """)
