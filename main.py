@@ -49,6 +49,7 @@ FEEDER_PRIORITY_CSV = ROOT / "feeder_priority_scores.csv"
 RAG_EVAL_CSV = ROOT / "rag_evaluation.csv"
 BUSINESS_IMPACT_CSV = ROOT / "business_impact_summary.csv"
 AGENT_LOG_JSON = ROOT / "agent_chat_log.json"
+AGENT_ROLES_CSV = ROOT / "agent_roles_and_responsibilities.csv"
 PPTX_FILE = ROOT / "nepal_energy_agentic_ai_demo.pptx"
 DOCX_FILE = ROOT / "nepal_energy_agentic_ai_report.docx"
 README_OUTPUT = ROOT / "RUNNING_STEPS.md"
@@ -215,9 +216,14 @@ def create_synthetic_csvs(seed: int = 42) -> None:
         ["K2", "Cross-border Export", "Nepal's growing hydropower base creates a business case for export timing, wet-season surplus management, and cross-border trade planning with India and Bangladesh.", "Reuters electricity export to Bangladesh", "https://www.reuters.com/business/energy/nepal-begins-first-power-exports-bangladesh-via-indias-grid-2025-06-16/"],
         ["K3", "Loss Reduction", "Distribution utilities can reduce non-technical losses by ranking high-risk customers, comparing expected and observed usage, prioritizing field visits, and tracking recovery after inspection.", "Synthetic utility operations note", "local synthetic knowledge"],
         ["K4", "Agentic RAG", "Agentic RAG improves over basic chatbot search by letting specialized agents retrieve evidence, reason over tables, check confidence, calculate evaluation metrics, and generate reports autonomously.", "Architecture note", "local synthetic knowledge"],
-        ["K5", "Workforce Productivity", "Automation should be framed as workforce capacity redeployment. AI can reduce repetitive manual workload while keeping humans for approvals, safety, field execution, and governance.", "Change management note", "local synthetic knowledge"],
+        ["K5", "Workforce Productivity", "Automation should be framed as repetitive employee workload reduction and capacity redeployment. AI can reduce manual data reading, billing review, field-list preparation, report writing, and repeated spreadsheet work while keeping humans for approvals, safety, field execution, and governance.", "Change management note", "local synthetic knowledge"],
         ["K6", "Evaluation", "RAG quality can be measured with MRR, retrieval relevance, semantic similarity, groundedness, faithfulness, and hallucination risk based on unsupported claims.", "Evaluation note", "local synthetic knowledge"],
         ["K7", "Open-source feasibility", "Open-source projects demonstrate electricity theft detection, time-series anomaly detection, and Agentic RAG patterns that can be adapted for a Nepal energy proof of concept.", "GitHub examples", "https://github.com/henryRDlab/ElectricityTheftDetection"],
+        ["K8", "Smart Meter Intelligence", "Smart meter intelligence agents can collect interval readings, meter events, offline signals, reverse-flow flags, and consumption changes. This reduces manual meter-data review and improves suspicious usage detection.", "Agent design note", "local synthetic knowledge"],
+        ["K9", "Billing and Revenue", "Billing and revenue agents can combine tariff, bill amount, arrears, lost kWh, and risk score to estimate recoverable revenue and prioritize high-value cases for approval.", "Agent design note", "local synthetic knowledge"],
+        ["K10", "Governance and Security", "Production deployment requires secure login, role-based access control, audit logs for every user action, approved data integration, privacy controls, cybersecurity checks, and human approval gates.", "Governance note", "local synthetic knowledge"],
+        ["K11", "Monitoring and Validation", "A production AI system should include monitoring dashboards, backup and disaster recovery, model validation by engineers and domain experts, and continuous tracking of recovered revenue and inspection hit rate.", "Operations note", "local synthetic knowledge"],
+        ["K12", "Field Inspection", "AI should prepare evidence packets and ranked field inspection lists, but major customer, legal, billing, or enforcement decisions should remain under human approval.", "Human approval note", "local synthetic knowledge"],
     ], columns=["doc_id", "topic", "text", "source_name", "source_url"])
     knowledge.to_csv(KNOWLEDGE_CSV, index=False)
 
@@ -286,8 +292,10 @@ def evaluate_rag(index: RagIndex) -> pd.DataFrame:
     eval_questions = [
         ("How can NEA reduce non-technical losses with AI?", "K3"),
         ("Why is cross-border electricity trade important for Nepal?", "K2"),
-        ("How should workforce reduction be framed for stakeholders?", "K5"),
-        ("Which metrics evaluate RAG quality?", "K6"),
+        ("How should employee workload reduction be framed for stakeholders?", "K5"),
+        ("How can smart meter intelligence increase revenue?", "K8"),
+        ("Which production controls are needed for NEA deployment?", "K10"),
+        ("Which production controls are needed for NEA deployment?", "K10"),
         ("Why is Agentic RAG better than a chatbot?", "K4"),
     ]
     rows = []
@@ -384,9 +392,9 @@ def calculate_business_impact(risk: pd.DataFrame, workforce: pd.DataFrame, hydro
         ["Scaled annual recovery for 25,000-customer pilot", scaled_25000_customer_recovery, "NPR/year", "Linear scale-up from this 800-customer synthetic portfolio; for demo planning only."],
         ["Total modeled export revenue opportunity", export_revenue, "NPR over synthetic period", "Based on synthetic hydro/export CSV, not an official forecast."],
         ["Baseline repetitive manual work", baseline_fte, "FTE-equivalent/month", "Manual review, reporting, complaint triage, loss analysis, field planning."],
-        ["Conservative half-workload redeployment target", half_workload_target, "FTE-equivalent/month", "Stakeholder framing: capacity redeployment, not layoffs."],
-        ["Modeled maximum redeployable capacity", redeployable_fte, "FTE-equivalent/month", "AI-assisted hours saved divided by 160 hours per FTE-month."],
-        ["Remaining manual work after AI assistance", remaining_fte, "FTE-equivalent/month", "Humans remain needed for approvals, field work, governance, and safety."],
+        ["Conservative manual-workforce reduction target", half_workload_target, "FTE-equivalent/month", "Stakeholder framing: reduce repetitive manual data-reading workload and redeploy staff; not automatic layoffs."],
+        ["Modeled maximum manual capacity saved", redeployable_fte, "FTE-equivalent/month", "AI-assisted hours saved divided by 160 hours per FTE-month; supports leaner staffing and revenue-focused work."],
+        ["Remaining manual work after AI assistance", remaining_fte, "FTE-equivalent/month", "Humans remain needed for approvals, field work, governance, customer communication, and safety."],
         ["Modeled repetitive workload reduction", saved_hours / baseline_hours * 100, "%", "Estimated productivity improvement across repetitive tasks."],
     ]
     return pd.DataFrame(rows, columns=["metric", "value", "unit", "explanation"])
@@ -415,11 +423,11 @@ def make_charts(risk: pd.DataFrame, feeder: pd.DataFrame, impact: pd.DataFrame, 
     plt.tight_layout(); plt.savefig(CHART_FEEDER, dpi=160); plt.close()
 
     vals = impact.set_index("metric")["value"]
-    labels = ["Baseline FTE", "Remaining FTE", "Redeployable FTE"]
-    values = [vals["Baseline repetitive manual work"], vals["Remaining manual work after AI assistance"], vals["Modeled maximum redeployable capacity"]]
+    labels = ["Manual FTE", "After AI", "Capacity Saved"]
+    values = [vals["Baseline repetitive manual work"], vals["Remaining manual work after AI assistance"], vals["Modeled maximum manual capacity saved"]]
     plt.figure(figsize=(8, 4.5))
     plt.bar(labels, values)
-    plt.title("Workforce productivity / redeployment estimate")
+    plt.title("Manual employee workload reduction estimate")
     plt.ylabel("FTE-equivalent/month")
     plt.tight_layout(); plt.savefig(CHART_WORKFORCE, dpi=160); plt.close()
 
@@ -460,17 +468,24 @@ def add_bullets(slide, x, y, w, h, bullets, font_size=15):
 
 
 AGENT_BLUEPRINT = [
-    ("1","Orchestrator Agent","Executive workflow coordinator","Coordinates the full autonomous run, triggers agents, tracks outputs, and ensures PPTX/DOCX/CSV/chart artifacts are created.","Executives, PMO, digital transformation team","Reduces status chasing, repeated coordination, and manual reporting follow-up.","Communicates with every agent and acts as the central controller."),
-    ("2","Data Agent","Data preparation specialist","Creates/loads customer, feeder, hydropower, workforce, and knowledge CSV files and validates columns.","IT data team, billing data team, MIS staff","Reduces repetitive spreadsheet cleaning, joining, and reformatting.","Passes clean tables to Risk, Feeder, Workforce, and RAG agents."),
-    ("3","Customer Risk Agent","Revenue protection analyst","Scores suspicious customer behavior using kWh drops, meter events, arrears, complaints, tariff class, and anomaly scores.","Revenue protection unit, distribution managers, field supervisors","Reduces manual scanning of thousands of accounts and prioritizes high-risk cases.","Receives clean data from Data Agent and sends ranked customers to Feeder and Business Impact agents."),
-    ("4","Feeder Prioritization Agent","Distribution planning analyst","Ranks feeders using loss, overload, outage, suspicious customer density, and recovery opportunity.","Distribution managers, operations engineers, planning teams","Reduces manual feeder-by-feeder comparison and field-crew prioritization.","Combines customer risk with feeder data and sends priorities to dashboards/reports."),
-    ("5","Hydropower & Trade Agent","Energy planning analyst","Adds hydropower seasonality, demand, import/export, EV-load, and power-trade context.","System planning, power trade, dispatch, generation planning","Reduces manual scenario preparation for seasonal and export/import discussion.","Provides strategic context to Business Impact and Reporting agents."),
-    ("6","Workforce Productivity Agent","Process automation analyst","Estimates baseline repetitive FTE-equivalent workload, AI-assisted workload, and redeployable capacity.","HR, department heads, managers, process owners","Shows how repetitive work can be reduced while redeploying staff to higher-value work.","Uses workforce task data and impact assumptions to feed charts/reports."),
-    ("7","Agentic RAG Agent","Knowledge retrieval specialist","Chunks knowledge, adds contextual metadata, creates local embeddings, retrieves evidence, and writes grounded answers.","Executives, policy teams, IT, legal, training teams","Reduces time spent searching reports, policies, and previous decision notes.","Retrieves evidence for Evaluation and Reporting agents."),
-    ("8","RAG Evaluation Agent","AI quality auditor","Measures MRR, relevance, similarity, groundedness, and hallucination-risk estimates.","AI governance team, IT QA, audit, management","Reduces manual AI quality checking and increases trust through transparent metrics.","Consumes retrieved evidence/answers and reports metrics to dashboard/PPTX/DOCX."),
-    ("9","Visualization Agent","Dashboard designer","Creates charts for risk, revenue, feeder priority, workforce redeployment, and RAG quality.","Managers, executives, reporting analysts","Reduces manual charting and screenshot work.","Receives final tables and creates visual assets."),
-    ("10","Reporting Agent","Stakeholder communication specialist","Creates stakeholder-ready PowerPoint, DOCX report, CSV outputs, and logs in one run.","Executives, managers, external stakeholders","Reduces report writing, formatting, and repeated slide preparation.","Final receiver of outputs from all agents."),
+    ("1", "Smart Meter Intelligence Agent", "Smart meter data collector and analytics agent", "Collects smart meter readings, meter events, current and previous kWh, offline meter signals, reverse-flow flags, and unusual consumption changes. It analyzes usage patterns and creates the first suspicious-activity signals.", "Smart meter team, distribution centers, IT/MIS team, revenue protection unit", "Reduces manual meter reading review, repeated spreadsheet checking, and low-value account screening. Staff can be redeployed to validation, customer communication, and field action.", "Sends clean smart-meter intelligence to the Billing, Loss/Theft, Feeder, and Reporting agents."),
+    ("2", "Customer Billing and Revenue Agent", "Billing record, arrears, tariff, and revenue-recovery analyst", "Reads customer billing records, tariff category, monthly bill, arrears, payment gaps, and estimated lost kWh. It calculates recoverable revenue and ranks accounts by financial impact.", "Billing section, finance, audit, customer service, revenue protection", "Reduces staff time spent reading billing files line by line and helps focus employees only on high-value exceptions.", "Receives meter-risk evidence and sends revenue opportunity to Executive Reporting and Field Approval agents."),
+    ("3", "Transformer and Feeder Health Agent", "Transformer, feeder, overload, and technical-loss analyst", "Analyzes transformer and feeder data, feeder loss percentage, peak loading ratio, suspicious-customer density, and revenue opportunity by feeder. It identifies feeders that deserve priority inspection or engineering attention.", "Distribution managers, feeder engineers, transformer maintenance teams, planning teams", "Reduces manual feeder-by-feeder comparison and improves crew planning, transformer monitoring, and preventive maintenance prioritization.", "Combines smart-meter and billing signals with feeder and transformer data for prioritized action."),
+    ("4", "Outage and Maintenance Prediction Agent", "Outage-risk and maintenance-priority agent", "Reads outage events, complaints, maintenance reports, peak loading, and feeder history. It highlights areas with outage risk, repeated complaints, or possible maintenance backlog.", "Operations, maintenance teams, call centers, distribution-center managers", "Reduces manual review of outage logs and helps staff focus on prevention instead of reacting after repeated failures.", "Feeds outage and reliability context into feeder priority, customer service, and executive dashboards."),
+    ("5", "Energy Loss and Theft Intelligence Agent", "Non-technical loss, theft-risk, and suspicious-usage analyst", "Combines smart meter events, sudden kWh drops, reverse-flow flags, bypass suspicion, arrears, feeder losses, and theft-related records. It prepares a risk score and evidence packet for human review.", "Revenue protection, legal/compliance, field inspection, district offices", "Reduces manual detection work across thousands of customers and increases recovered revenue by sending teams to the right cases first.", "Shares ranked cases with the Field Inspection and Human Approval Agent before any customer action."),
+    ("6", "Substation and Distribution Network Agent", "Substation, distribution-network, and grid-planning agent", "Uses substation and distribution network data to identify weak areas, overloaded zones, high-loss corridors, and planning needs for upgrades, smart meters, and reliability improvement.", "Grid planning, substation teams, distribution engineering, NEA leadership", "Reduces repeated manual network analysis and supports data-driven investment planning for distribution modernization.", "Connects feeder, outage, loss, and inspection outputs into a network-level planning view."),
+    ("7", "Field Inspection and Human Approval Agent", "Evidence-pack, inspection-routing, and approval-control agent", "Turns risk findings into inspection packets: customer ID, feeder, meter event, lost kWh, arrears, priority reason, and recommended action. It requires human approval before major decisions.", "Field supervisors, inspection teams, managers, customer-service officers", "Reduces time spent preparing field lists and helps employees spend more time in actual verification, safety checks, and customer communication.", "Receives outputs from Loss/Theft, Billing, Feeder, and Outage agents; sends approved outcomes back for validation."),
+    ("8", "Governance, Security and Audit Agent", "Login, role-based access, audit-log, privacy, and cybersecurity agent", "Defines secure login, role-based access control, audit logs for every user action, privacy controls, cybersecurity checks, and separation between demo data and approved NEA production data.", "IT security, audit, legal, data governance, NEA management", "Reduces manual compliance tracking and creates transparent records of who viewed data, changed settings, approved actions, or generated reports.", "Wraps every agent action with access control, auditability, and privacy safeguards."),
+    ("9", "Monitoring, Backup and Model Validation Agent", "System-health, disaster-recovery, and model-quality agent", "Monitors system health, data refresh status, pipeline failures, model drift, backup readiness, disaster recovery, RAG quality, and regular validation by NEA engineers and domain experts.", "IT operations, AI governance, engineers, domain experts, disaster-recovery team", "Reduces manual health checks and helps NEA trust the system through continuous monitoring, backup planning, and validation reports.", "Sends reliability and validation metrics to dashboards, PPTX, DOCX, and audit logs."),
+    ("10", "Executive Reporting and Agentic RAG Agent", "Management reporting, customer-service insight, RAG, and decision-support agent", "Uses Agentic RAG to retrieve evidence from approved policies/reports, summarizes findings, creates dashboards, PowerPoint, DOCX, CSV outputs, and management-ready recommendations.", "NEA leadership, managers, customer service, planning, stakeholders", "Reduces manual report writing, slide preparation, document search, and repeated management briefing work while increasing transparency and revenue-focused decision support.", "Final receiver of all agent outputs; creates stakeholder-ready reports and public demo outputs."),
 ]
+
+
+def agent_roles_dataframe() -> pd.DataFrame:
+    return pd.DataFrame(
+        AGENT_BLUEPRINT,
+        columns=["No", "Agent", "Role", "Data and Analysis Work", "NEA Users", "Employee Workload / Revenue Impact", "Communication"],
+    )
 TECH_STACK = [
     ("Frontend","Streamlit","Interactive public dashboard; Streamlit Community Cloud entry point is streamlit_app.py."),
     ("Language","Python","Simple flat project with main.py and streamlit_app.py."),
@@ -509,26 +524,26 @@ def create_pptx(risk: pd.DataFrame, feeder: pd.DataFrame, impact: pd.DataFrame, 
     prs=Presentation(); prs.slide_width=PptInches(13.333); prs.slide_height=PptInches(7.5); blank=prs.slide_layouts[6]
     def slide(title, subtitle=None):
         s=prs.slides.add_slide(blank); bg=s.background.fill; bg.solid(); bg.fore_color.rgb=PptRGBColor(248,250,252); add_title(s,title,subtitle); add_slide_number(s,len(prs.slides)); return s
-    vals=impact.set_index("metric")["value"]; annual=vals.get("Scaled annual recovery for 25,000-customer pilot", vals["Annual revenue recovery opportunity from high-risk customers"]); pilot_annual=vals["Annual revenue recovery opportunity from high-risk customers"]; fte=vals["Modeled maximum redeployable capacity"]; reduction=vals["Modeled repetitive workload reduction"]
+    vals=impact.set_index("metric")["value"]; annual=vals.get("Scaled annual recovery for 25,000-customer pilot", vals["Annual revenue recovery opportunity from high-risk customers"]); pilot_annual=vals["Annual revenue recovery opportunity from high-risk customers"]; fte=vals["Modeled maximum manual capacity saved"]; reduction=vals["Modeled repetitive workload reduction"]
     s=slide("Nepal Energy Agentic AI Command Center","Autonomous multi-agent demo for loss reduction, revenue recovery, workforce productivity, Agentic RAG, evaluation, and reporting")
-    add_metric_card(s,0.7,1.3,2.8,1.15,"Annual recovery",money(annual),"Modeled 25,000-customer pilot"); add_metric_card(s,3.75,1.3,2.8,1.15,"Workload reduction",pct(reduction),"Repetitive manual work"); add_metric_card(s,6.8,1.3,2.8,1.15,"Redeployable capacity",f"{fte:.1f} FTE","Capacity, not layoffs"); add_metric_card(s,9.85,1.3,2.8,1.15,"Agents",f"{len(AGENT_BLUEPRINT)}","Coordinated workflow")
+    add_metric_card(s,0.7,1.3,2.8,1.15,"Annual recovery",money(annual),"Modeled 25,000-customer pilot"); add_metric_card(s,3.75,1.3,2.8,1.15,"Workload reduction",pct(reduction),"Repetitive manual work"); add_metric_card(s,6.8,1.3,2.8,1.15,"Manual capacity saved",f"{fte:.1f} FTE","Manual work saved"); add_metric_card(s,9.85,1.3,2.8,1.15,"Agents",f"{len(AGENT_BLUEPRINT)}","Coordinated workflow")
     add_bullets(s,0.9,3.05,11.7,3.3,["Best use case: NEA-style Energy Loss, Revenue Protection, and Workforce Productivity Command Center.","Not a chatbot: an autonomous workflow using data, agents, retrieval, evaluation, charts, PPTX, and DOCX.","All data is synthetic for safe public demonstration; production requires approved data and human approval gates."],17)
     s=slide("Why this use case wins for Nepal energy","Better than a chatbot because it targets measurable outcomes")
     add_bullets(s,0.7,1.15,12,5.7,["Revenue protection: flags suspicious customers and estimates recoverable energy/revenue.","Distribution operations: prioritizes feeders where losses, overload, suspicious accounts, and outage hours intersect.","Management productivity: turns manual spreadsheets and meeting preparation into automated evidence-based reporting.","Planning value: connects distribution loss control with hydropower, EV load, and power-trade context.","Stakeholder value: produces transparent RAG metrics, charts, PowerPoint, DOCX, and agent logs."],18)
     s=slide("Autonomous agent map","Agents communicate through shared data, evidence, metrics, charts, and reports")
-    add_bullets(s,0.65,1.1,6,5.8,["Orchestrator controls the sequence and triggers each agent.","Data Agent prepares CSVs and validates tables.","Customer Risk Agent scores suspicious accounts.","Feeder Agent combines customer risk with feeder indicators.","Hydropower & Trade Agent adds seasonal and strategic planning context."],15)
-    add_bullets(s,6.8,1.1,6,5.8,["Workforce Agent calculates manual-work reduction and redeployment capacity.","Agentic RAG Agent retrieves contextual evidence.","RAG Evaluation Agent checks quality and hallucination risk.","Visualization Agent generates charts.","Reporting Agent creates PPTX, DOCX, CSV, and JSON outputs."],15)
+    add_bullets(s,0.65,1.1,6,5.8,["Smart Meter Agent collects usage and meter-event signals.","Billing and Revenue Agent estimates lost kWh and recoverable NPR.","Transformer and Feeder Agent ranks high-loss and overloaded assets.","Outage and Maintenance Agent highlights reliability risk.","Energy Loss/Theft Agent prepares suspicious-usage evidence."],15)
+    add_bullets(s,6.8,1.1,6,5.8,["Substation and Network Agent supports planning decisions.","Field Inspection/Human Approval Agent prepares approved inspection packets.","Governance/Security Agent adds login, RBAC, audit, and privacy controls.","Monitoring/Backup/Validation Agent tracks health and model quality.","Executive Reporting/RAG Agent creates dashboard, PPTX, DOCX, and grounded answers."],15)
     s=slide("How agents reduce work by employee level","The goal is redeployment to higher-value work, not automatic replacement")
     add_bullets(s,0.7,1.1,12,5.9,["Executives: decision-ready summaries instead of repeated slide-update requests.","Managers: less manual feeder, field-visit, and monthly performance prioritization.","IT/MIS staff: less data cleaning, CSV merging, dashboard refresh, and report-generation work.","Revenue protection teams: focus on validated high-risk cases instead of scanning thousands of accounts.","Field supervisors: ranked inspection priorities and evidence packets while retaining final judgment.","Finance/audit teams: consistent revenue-recovery assumptions, traceable metrics, and logs."],16)
     s=slide("Business impact: revenue and workforce","Modeled demonstration numbers generated from synthetic data")
-    add_bullets(s,0.7,1.15,5.8,5.5,[f"Pilot annual recovery: {money(pilot_annual)}",f"Scaled 25,000-customer annual recovery: {money(annual)}",f"Monthly recovery opportunity: {money(vals['Monthly revenue recovery opportunity'])}",f"Baseline repetitive work: {vals['Baseline repetitive manual work']:.1f} FTE-equivalent/month",f"Conservative half-workload target: {vals['Conservative half-workload redeployment target']:.1f} FTE-equivalent/month",f"Modeled max redeployable capacity: {vals['Modeled maximum redeployable capacity']:.1f} FTE-equivalent/month"],14)
+    add_bullets(s,0.7,1.15,5.8,5.5,[f"Pilot annual recovery: {money(pilot_annual)}",f"Scaled 25,000-customer annual recovery: {money(annual)}",f"Monthly recovery opportunity: {money(vals['Monthly revenue recovery opportunity'])}",f"Baseline repetitive work: {vals['Baseline repetitive manual work']:.1f} FTE-equivalent/month",f"Conservative manual-workforce reduction target: {vals['Conservative manual-workforce reduction target']:.1f} FTE-equivalent/month",f"Modeled manual capacity saved: {vals['Modeled maximum manual capacity saved']:.1f} FTE-equivalent/month"],14)
     s.shapes.add_picture(str(CHART_REVENUE),PptInches(6.8),PptInches(1.2),width=PptInches(5.9))
     s=slide("Technology stack used in this demo","Simple public-cloud-friendly architecture; production upgrades are straightforward")
     for i,(layer,tool,why) in enumerate(TECH_STACK[:8]): add_metric_card(s,0.55+(i%2)*6.35,1.0+(i//2)*1.38,5.95,1.07,layer,tool,why)
     s=slide("RAG, LLM, embedding, and search design","Exact technology choices used in the demo")
     add_bullets(s,0.7,1.1,12,5.9,["LLM used: local deterministic demo LLM/template generator that writes answers only from retrieved evidence; no API key required.","RAG used: Agentic RAG because retrieval is one agent inside a larger autonomous workflow.","Hybrid search used: contextual lexical-semantic retrieval using TF-IDF n-grams plus topic/source/context prefixes.","Embedding used: contextual TF-IDF vector embedding for reliable Streamlit Community Cloud deployment.","Production embedding upgrade: Gemini text-embedding-004, BGE/E5, Instructor, or OpenAI embeddings.","Production vector DB upgrade: Chroma, FAISS, Pinecone, Weaviate, Milvus, or PostgreSQL pgvector.","Production LLM upgrade: Gemini, OpenAI, Groq, or local Ollama models with citation and grounding checks."],16)
     s=slide("Agentic RAG workflow","Question -> retrieval -> grounded answer -> evaluation -> reporting")
-    add_bullets(s,0.7,1.1,12,5.9,["Knowledge CSV rows become contextual chunks with topic, source, URL, and Nepal energy context.","Chunks are embedded into a local vector matrix using TF-IDF n-grams over contextual text.","The RAG Agent retrieves top evidence chunks for each executive question.","The grounded generator builds answer text from retrieved evidence to reduce unsupported claims.","The Evaluation Agent calculates MRR, relevance, similarity, groundedness, and hallucination-risk estimate.","The Reporting Agent writes metrics and answer previews into PPTX, DOCX, CSV, and Streamlit views."],16)
+    add_bullets(s,0.7,1.1,12,5.9,["Knowledge CSV rows become contextual chunks with topic, source, URL, and Nepal energy context.","Chunks are embedded into a local vector matrix using TF-IDF n-grams over contextual text.","The Executive Reporting and Agentic RAG Agent retrieves top evidence chunks for each executive question.","The grounded generator builds answer text from retrieved evidence to reduce unsupported claims.","The Monitoring, Backup and Model Validation Agent calculates MRR, relevance, similarity, groundedness, and hallucination-risk estimate.","The Executive Reporting and Agentic RAG Agent writes metrics and answer previews into PPTX, DOCX, CSV, and Streamlit views."],16)
     s=slide("RAG evaluation matrix","Quality metrics included in dashboard and reports")
     add_bullets(s,0.7,1.0,5.8,5.8,[f"{name}: {meaning}" for name,_,meaning in RAG_METRIC_DEFS],13); s.shapes.add_picture(str(CHART_RAG),PptInches(6.8),PptInches(1.2),width=PptInches(5.8))
     s=slide("RAG evaluation results","Average scores from synthetic demo questions")
@@ -536,7 +551,7 @@ def create_pptx(risk: pd.DataFrame, feeder: pd.DataFrame, impact: pd.DataFrame, 
     add_bullets(s,0.8,3.2,11.8,3.0,["These are demonstration metrics from synthetic evidence and deterministic retrieval.","For production, the same evaluation layer should run against human-labeled questions and field outcomes.","Grounding and hallucination monitoring help managers decide where human review is mandatory."],16)
     s=slide("Suspicious activity detection","Customer-level anomaly scoring and revenue recovery"); s.shapes.add_picture(str(CHART_RISK),PptInches(0.7),PptInches(1.15),width=PptInches(5.9)); s.shapes.add_picture(str(CHART_REVENUE),PptInches(6.85),PptInches(1.15),width=PptInches(5.8))
     s=slide("Feeder prioritization","Combines feeder losses, overload, outage hours, and suspicious customer density"); s.shapes.add_picture(str(CHART_FEEDER),PptInches(0.75),PptInches(1.1),width=PptInches(6.1)); add_bullets(s,7.1,1.3,5.6,4.9,["Managers see which feeders deserve inspection first.","Revenue teams can coordinate field visits with feeder-loss priorities.","IT teams automate monthly ranking instead of ad-hoc spreadsheets.","Executive dashboards track progress by feeder, district, and center."],16)
-    s=slide("Workforce productivity and redeployment","Automation reduces repetitive work while increasing governance and field effectiveness"); s.shapes.add_picture(str(CHART_WORKFORCE),PptInches(0.8),PptInches(1.15),width=PptInches(6)); add_bullets(s,7,1.25,5.7,5,[f"Modeled repetitive workload reduction: {pct(reduction)}.",f"Redeployable capacity estimate: {fte:.1f} FTE-equivalent/month.","Best framing: reduce manual reporting, repeated data cleaning, and low-value screening.","Employees shift toward validation, exception handling, customer engagement, safety, and governance."],16)
+    s=slide("Employee workload reduction and revenue focus","Automation reduces repetitive work while increasing governance and field effectiveness"); s.shapes.add_picture(str(CHART_WORKFORCE),PptInches(0.8),PptInches(1.15),width=PptInches(6)); add_bullets(s,7,1.25,5.7,5,[f"Modeled repetitive workload reduction: {pct(reduction)}.",f"Manual capacity saved estimate: {fte:.1f} FTE-equivalent/month.","Best framing: reduce manual reporting, repeated data cleaning, and low-value screening.","Employees shift toward validation, exception handling, customer engagement, safety, and governance."],16)
     s=slide("PowerPoint, DOCX, and Streamlit automation","A single run produces stakeholder-ready outputs"); add_bullets(s,0.7,1.1,12,5.9,["Command: python main.py generates synthetic CSVs, agent scores, RAG metrics, charts, PPTX, DOCX, logs, and running steps.","Command: streamlit run streamlit_app.py launches the public dashboard.","Streamlit Community Cloud main file: streamlit_app.py.","The same generated CSVs/images are reused in dashboard, Word report, and presentation for consistency.","The flat project is easy to teach, modify, upload to GitHub, and deploy publicly."],17)
     s=slide("Production roadmap and governance","How this demo becomes a real NEA pilot"); add_bullets(s,0.7,1.1,12,5.9,["Phase 1: offline pilot using approved billing, meter, feeder, outage, and complaint data.","Phase 2: validate risk scores with field inspection outcomes and recovered revenue.","Phase 3: role-based dashboards for executives, managers, IT, revenue protection, and field supervisors.","Phase 4: audit trails, cybersecurity, privacy, explainability, model monitoring, and human approval gates.","Phase 5: scale after transparent evaluation and stakeholder training."],17)
     s=slide("Decision ask for stakeholders","Start with a focused, measurable, low-risk pilot"); add_bullets(s,0.7,1.1,12,5.9,["Approve a 60-90 day pilot in selected distribution centers using historical data.","Measure recovered revenue, inspection hit rate, repetitive reporting hours saved, and RAG answer quality.","Use AI as decision support and productivity support, not as an unsupervised decision maker.","Keep humans responsible for approvals, customer actions, field safety, and legal decisions."],18)
@@ -593,7 +608,7 @@ def create_docx(risk: pd.DataFrame, feeder: pd.DataFrame, impact: pd.DataFrame, 
 
     # 3
     doc.add_heading("3. How many agents are used?",level=1)
-    doc.add_paragraph(f"The demo uses {len(AGENT_BLUEPRINT)} agents. They are not isolated chatbots. They communicate through a shared workflow controlled by the Orchestrator Agent.")
+    doc.add_paragraph(f"The demo uses {len(AGENT_BLUEPRINT)} specialized agents. They are not isolated chatbots. They communicate through shared CSV outputs, charts, logs, RAG evidence, and reporting artifacts.")
     for num,name,role,work,employee,reduce,comm in AGENT_BLUEPRINT:
         doc.add_heading(f"{num}. {name}", level=2)
         for label, text in [("Role",role),("Main work",work),("Employee level supported",employee),("Work reduced",reduce),("Communication",comm)]:
@@ -601,8 +616,8 @@ def create_docx(risk: pd.DataFrame, feeder: pd.DataFrame, impact: pd.DataFrame, 
     doc.add_page_break()
 
     pages = [
-        ("4. Agent communication model", ["Agents communicate sequentially and through shared artifacts. The Orchestrator starts the run, the Data Agent prepares CSVs, the Risk Agent scores customers, the Feeder Agent combines results, the RAG Agent retrieves evidence, the Evaluation Agent measures quality, and the Reporting Agent creates final outputs.", "Some agents can work independently, but the highest value comes from communication. Feeder ranking improves after receiving suspicious-customer density from the Risk Agent."], ["Independent work: data validation, RAG indexing, chart generation, workforce scoring.","Collaborative work: feeder prioritization, revenue recovery, RAG evaluation, and report generation.","Production upgrade: LangGraph, CrewAI, AutoGen, Google ADK, or custom orchestration."], None),
-        ("5. Workforce impact by employee level", ["The demo estimates repetitive workload reduction in FTE-equivalent terms. This helps show how low-value repetitive work can be automated so employees can be redeployed to higher-value tasks.", f"Modeled maximum redeployable capacity: {vals['Modeled maximum redeployable capacity']:.1f} FTE-equivalent/month. Conservative half-workload redeployment target: {vals['Conservative half-workload redeployment target']:.1f} FTE-equivalent/month."], ["Managerial level: less manual performance compilation and feeder prioritization.","IT/MIS level: less CSV cleaning, dashboard refresh, and ad-hoc data pulling.","Revenue-protection level: less manual account screening.","Field-supervisor level: better inspection priorities and evidence packets.","Finance/audit level: repeatable assumptions and logs."], CHART_WORKFORCE),
+        ("4. Agent communication model", ["Agents communicate sequentially and through shared artifacts. The Smart Meter Agent reads usage signals, Billing Agent estimates recovery, Feeder Agent prioritizes assets, Loss/Theft Agent creates risk evidence, Field Approval Agent prepares inspection packets, and Reporting/RAG Agent creates stakeholder outputs.", "Some agents can work independently, but the highest value comes from communication. Feeder ranking improves after receiving suspicious-customer density from the Risk Agent."], ["Independent work: data validation, RAG indexing, chart generation, workforce scoring.","Collaborative work: feeder prioritization, revenue recovery, RAG evaluation, and report generation.","Production upgrade: LangGraph, CrewAI, AutoGen, Google ADK, or custom orchestration."], None),
+        ("5. Workforce impact by employee level", ["The demo estimates repetitive workload reduction in FTE-equivalent terms. This helps show how low-value repetitive work can be automated so employees can be redeployed to higher-value tasks.", f"Modeled maximum manual capacity saved: {vals['Modeled maximum manual capacity saved']:.1f} FTE-equivalent/month. Conservative manual-workforce reduction target: {vals['Conservative manual-workforce reduction target']:.1f} FTE-equivalent/month."], ["Managerial level: less manual performance compilation and feeder prioritization.","IT/MIS level: less CSV cleaning, dashboard refresh, and ad-hoc data pulling.","Revenue-protection level: less manual account screening.","Field-supervisor level: better inspection priorities and evidence packets.","Finance/audit level: repeatable assumptions and logs."], CHART_WORKFORCE),
         ("6. Revenue generation and recovery logic", ["Revenue generation comes from prioritizing high-risk accounts and high-loss feeders. The Customer Risk Agent estimates recovery opportunity, then the Business Impact Agent scales the pilot.", "In production, revenue numbers should be validated against field inspections, corrected meter data, recovered arrears, recovered kWh, and reduced losses."], [f"Modeled annual recovery opportunity: {money(annual)}.",f"Modeled monthly recovery opportunity: {money(vals['Monthly revenue recovery opportunity'])}.","Validation KPI: inspection hit rate, recovered kWh, recovered NPR, reduced feeder loss, reduced repeat complaints."], CHART_REVENUE),
         ("7. Technology architecture overview", ["The project is intentionally simple for public demonstration and Streamlit Community deployment. It uses a flat Python structure and does not require paid API keys.", "The architecture still demonstrates multi-agent orchestration, Agentic RAG, contextual embeddings, hybrid retrieval, model evaluation, and automated stakeholder reporting."], None, None),
     ]
@@ -662,22 +677,27 @@ def create_docx(risk: pd.DataFrame, feeder: pd.DataFrame, impact: pd.DataFrame, 
     doc.save(DOCX_FILE)
 
 def create_running_steps() -> None:
-    README_OUTPUT.write_text(r"""# Nepal Energy Agentic AI Demo - Simple Flat Version
+    README_OUTPUT.write_text(r"""# NEA Intelligent Energy Command Center - Streamlit Cloud Demo
 
-This version is intentionally simple: no nested code folders, no package imports, and no secrets required.
+This version is designed for **Streamlit Community Cloud** deployment and public stakeholder demonstration. It uses only synthetic data and requires **no API key**.
 
-## Files
+## What the 10 agents do
 
-- `main.py` - Generates data, runs agents, RAG, evaluation, charts, PPTX, DOCX, and CSV outputs.
-- `streamlit_app.py` - Streamlit dashboard.
-- `requirements.txt` - Python packages.
-- `synthetic_*.csv` - Synthetic Nepal energy data.
-- Generated files: `nepal_energy_agentic_ai_demo.pptx`, `nepal_energy_agentic_ai_report.docx`, `risk_scores.csv`, `rag_evaluation.csv`, charts, and logs.
+1. Smart Meter Intelligence Agent - reads smart meter signals and finds unusual consumption.
+2. Customer Billing and Revenue Agent - analyzes bills, arrears, lost kWh, and recovery opportunity.
+3. Transformer and Feeder Health Agent - ranks feeders and transformer/feeder risk.
+4. Outage and Maintenance Prediction Agent - reviews outage/maintenance patterns and reliability risk.
+5. Energy Loss and Theft Intelligence Agent - detects suspicious usage and prepares evidence.
+6. Substation and Distribution Network Agent - supports network planning and distribution modernization.
+7. Field Inspection and Human Approval Agent - prepares inspection packets and requires human approval.
+8. Governance, Security and Audit Agent - defines login, RBAC, audit logs, privacy, and cybersecurity controls.
+9. Monitoring, Backup and Model Validation Agent - tracks system health, backup, disaster recovery, and validation.
+10. Executive Reporting and Agentic RAG Agent - creates dashboard, PPTX, DOCX, CSVs, and grounded answers.
 
 ## Local run on Windows PowerShell
 
 ```powershell
-cd C:\Users\Parshuram\Downloads\nepal_energy_flat_demo
+cd C:\Users\Parshuram\Downloads\nea_intelligent_energy_command_center
 python -m venv .venv
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\Activate.ps1
@@ -686,7 +706,7 @@ python main.py
 streamlit run streamlit_app.py
 ```
 
-If activation gives trouble, skip activation and run:
+If activation gives trouble, use:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
@@ -696,27 +716,31 @@ If activation gives trouble, skip activation and run:
 
 ## Streamlit Community Cloud deployment
 
-1. Create a GitHub repository.
-2. Upload all files from this folder to the repository root.
-3. Go to Streamlit Community Cloud.
-4. Select your GitHub repository.
-5. Set the main file path to: `streamlit_app.py`.
-6. Deploy.
+1. Create a new GitHub repository, for example: `nea-intelligent-energy-command-center`.
+2. Unzip this project.
+3. Upload **all files inside this folder** to the GitHub repository root. Do not upload only the ZIP.
+4. Go to Streamlit Community Cloud.
+5. Click **Create app** or **New app**.
+6. Select your GitHub repository.
+7. Set **Main file path** to: `streamlit_app.py`.
+8. Click **Deploy**.
+9. Share the public app URL with NEA stakeholders.
 
-No API key is required for demo mode.
+## Production note for NEA
 
-## Important note
+For real NEA deployment, replace synthetic CSVs with approved NEA data sources only. Add secure login, role-based access control, audit logs for every user action, approved data integration, human approval gates, monitoring dashboards, data privacy, cybersecurity controls, backup/disaster recovery, and regular model validation by NEA engineers and domain experts.
 
-All data is synthetic. Employee impact is shown as repetitive workload reduction and capacity redeployment, not direct layoffs.
+Employee impact should be presented as reducing repetitive manual data-reading/reporting workload and redeploying staff to higher-value revenue recovery, field verification, customer service, safety, governance, and planning work.
 """, encoding="utf-8")
 
 
 def run_autonomous_pipeline() -> Dict:
     logs: List[Dict] = []
-    log_event(logs, "Orchestrator Agent", "Starting full autonomous Nepal energy AI pipeline.")
+    log_event(logs, "Smart Meter Intelligence Agent", "Starting full autonomous NEA energy intelligence pipeline.")
 
     create_synthetic_csvs()
-    log_event(logs, "Data Agent", "Created/updated synthetic CSV files.", {"files": [p.name for p in [CUSTOMERS_CSV, FEEDERS_CSV, HYDRO_CSV, WORKFORCE_CSV, KNOWLEDGE_CSV]]})
+    agent_roles_dataframe().to_csv(AGENT_ROLES_CSV, index=False)
+    log_event(logs, "Smart Meter Intelligence Agent", "Created/updated synthetic smart meter, billing, feeder, outage, workforce, and knowledge CSV files.", {"files": [p.name for p in [CUSTOMERS_CSV, FEEDERS_CSV, HYDRO_CSV, WORKFORCE_CSV, KNOWLEDGE_CSV, AGENT_ROLES_CSV]]})
 
     customers = pd.read_csv(CUSTOMERS_CSV)
     feeders = pd.read_csv(FEEDERS_CSV)
@@ -726,38 +750,38 @@ def run_autonomous_pipeline() -> Dict:
 
     risk = run_customer_risk(customers)
     risk.to_csv(RISK_CSV, index=False)
-    log_event(logs, "Risk Detection Agent", "Scored suspicious customer activity and revenue recovery opportunity.", {"high_risk_customers": int((risk["risk_score_0_100"] >= 70).sum())})
+    log_event(logs, "Energy Loss and Theft Intelligence Agent", "Scored suspicious customer activity and revenue recovery opportunity.", {"high_risk_customers": int((risk["risk_score_0_100"] >= 70).sum())})
 
     feeder_priority = run_feeder_priority(feeders, risk)
     feeder_priority.to_csv(FEEDER_PRIORITY_CSV, index=False)
-    log_event(logs, "Feeder Agent", "Prioritized feeders for inspection and digital monitoring.", {"top_feeder": feeder_priority.iloc[0]["feeder_id"]})
+    log_event(logs, "Transformer and Feeder Health Agent", "Prioritized feeders for inspection and digital monitoring.", {"top_feeder": feeder_priority.iloc[0]["feeder_id"]})
 
     index = build_rag_index(knowledge)
     rag_eval = evaluate_rag(index)
     rag_eval.to_csv(RAG_EVAL_CSV, index=False)
-    log_event(logs, "Agentic RAG Agent", "Built contextual retrieval index and generated RAG evaluation.", {"chunks": int(len(index.chunks)), "avg_mrr": float(rag_eval["mrr"].mean())})
+    log_event(logs, "Executive Reporting and Agentic RAG Agent", "Built contextual retrieval index and generated RAG evaluation.", {"chunks": int(len(index.chunks)), "avg_mrr": float(rag_eval["mrr"].mean())})
 
     impact = calculate_business_impact(risk, workforce, hydro)
     impact.to_csv(BUSINESS_IMPACT_CSV, index=False)
-    log_event(logs, "Business Impact Agent", "Calculated revenue recovery and workforce redeployment estimates.", {"annual_revenue_npr": float(impact.iloc[0]["value"])})
+    log_event(logs, "Customer Billing and Revenue Agent", "Calculated revenue recovery and workforce redeployment estimates.", {"annual_revenue_npr": float(impact.iloc[0]["value"])})
 
     make_charts(risk, feeder_priority, impact, rag_eval)
-    log_event(logs, "Visualization Agent", "Generated charts.")
+    log_event(logs, "Monitoring, Backup and Model Validation Agent", "Generated charts.")
 
     create_pptx(risk, feeder_priority, impact, rag_eval)
     create_docx(risk, feeder_priority, impact, rag_eval)
     create_running_steps()
-    log_event(logs, "Reporting Agent", "Created stakeholder PPTX, DOCX, CSV outputs, and running steps.")
+    log_event(logs, "Executive Reporting and Agentic RAG Agent", "Created stakeholder PPTX, DOCX, CSV outputs, and running steps.")
 
+    log_event(logs, "Executive Reporting and Agentic RAG Agent", "Completed full autonomous run.")
     AGENT_LOG_JSON.write_text(json.dumps(logs, indent=2), encoding="utf-8")
-    log_event(logs, "Orchestrator Agent", "Completed full autonomous run.")
 
     return {
         "risk_rows": len(risk),
         "top_customer": risk.iloc[0]["customer_id"],
         "annual_revenue_recovery_npr": float(impact.iloc[0]["value"]),
         "workload_reduction_pct": float(impact.query("metric == 'Modeled repetitive workload reduction'")["value"].iloc[0]),
-        "redeployable_fte": float(impact.query("metric == 'Modeled maximum redeployable capacity'")["value"].iloc[0]),
+        "manual_capacity_saved_fte": float(impact.query("metric == 'Modeled maximum manual capacity saved'")["value"].iloc[0]),
         "pptx": str(PPTX_FILE),
         "docx": str(DOCX_FILE),
     }
