@@ -180,16 +180,7 @@ with tabs[7]:
     st.markdown("""
 ### Streamlit Community Cloud Demo Deployment
 
-This package is ready for public demo deployment on Streamlit Community Cloud. It uses synthetic data only and does **not** require an API key.
-
-1. Create a GitHub repository, for example `nea-intelligent-energy-command-center`.
-2. Unzip this project on your computer.
-3. Upload all files inside the project folder to the repository root.
-4. Go to Streamlit Community Cloud.
-5. Click **Create app** / **New app**.
-6. Select the GitHub repository.
-7. Set **Main file path** to `streamlit_app.py`.
-8. Deploy and share the public URL with NEA leadership and stakeholders.
+This package is ready for public demo deployment. It uses  data only and does **not** require an API key.
 
 ---
 
